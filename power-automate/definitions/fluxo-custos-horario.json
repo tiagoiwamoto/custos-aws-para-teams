@@ -1,0 +1,164 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "triggers": {
+      "Recorrencia_diaria_9h": {
+        "type": "Recurrence",
+        "recurrence": {
+          "frequency": "Day",
+          "interval": 1,
+          "timeZone": "E. South America Standard Time",
+          "startTime": "@{formatDateTime(addDays(utcNow(), 1), 'yyyy-MM-dd')}T09:00:00",
+          "schedule": { "hours": [9], "minutes": [0] }
+        }
+      }
+    },
+    "actions": {
+      "Obter_contas_ativas": {
+        "type": "ApiConnection",
+        "inputs": {
+          "host": {
+            "connection": { "name": "@parameters('$connections')['shared_sharepointonline']['connectionId']" }
+          },
+          "method": "get",
+          "path": "/datasets/@{encodeURIComponent('https://<tenant>.sharepoint.com/sites/<site>')}/tables/@{encodeURIComponent('ContasAWS')}/items",
+          "queries": {
+            "$filter": "Ativo eq 1",
+            "$top": 100
+          }
+        }
+      },
+      "Para_cada_conta": {
+        "type": "Foreach",
+        "foreach": "@body('Obter_contas_ativas')?['value']",
+        "actions": {
+          "Chamar_Function_AWS": {
+            "type": "Http",
+            "inputs": {
+              "method": "POST",
+              "uri": "https://<function-app>.azurewebsites.net/api/top-costs?code=<function-key>",
+              "headers": { "Content-Type": "application/json" },
+              "body": {
+                "roleArn": "@items('Para_cada_conta')?['RoleArn']",
+                "externalId": "@items('Para_cada_conta')?['ExternalId']",
+                "accountName": "@items('Para_cada_conta')?['Title']",
+                "topN": 10
+              }
+            }
+          },
+          "Filtrar_itens_em_alerta": {
+            "type": "Query",
+            "runAfter": { "Chamar_Function_AWS": ["Succeeded"] },
+            "inputs": {
+              "from": "@body('Chamar_Function_AWS')?['items']",
+              "where": "@or(greater(item()?['cost'], items('Para_cada_conta')?['LimiteItemUSD']), greater(coalesce(item()?['deltaPct'], 0), items('Para_cada_conta')?['CrescimentoMaxPct']))"
+            }
+          },
+          "Select_linhas": {
+            "type": "Select",
+            "runAfter": { "Filtrar_itens_em_alerta": ["Succeeded"] },
+            "inputs": {
+              "from": "@body('Chamar_Function_AWS')?['items']",
+              "select": {
+                "type": "ColumnSet",
+                "columns": [
+                  { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "@item()?['service']", "wrap": true } ] },
+                  { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "@concat('R$ ', string(item()?['costBrl']))" } ] },
+                  { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "@string(item()?['cost'])", "isSubtle": true } ] },
+                  { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "@string(item()?['previousCost'])", "isSubtle": true } ] },
+                  { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "@if(equals(item()?['deltaPct'], null), 'novo', concat(string(item()?['deltaPct']), '%'))" } ] }
+                ]
+              }
+            }
+          },
+          "Montar_texto_alertas": {
+            "type": "Select",
+            "runAfter": { "Select_linhas": ["Succeeded"] },
+            "inputs": {
+              "from": "@body('Filtrar_itens_em_alerta')",
+              "select": "@concat('• ', item()?['service'], ': R$ ', string(item()?['costBrl']), ' (US$ ', string(item()?['cost']), ')', if(equals(item()?['deltaPct'], null), ' (item novo)', concat(' (', string(item()?['deltaPct']), '% acima do dia anterior)')))"
+            }
+          },
+          "Se_houver_alertas": {
+            "type": "If",
+            "runAfter": { "Montar_texto_alertas": ["Succeeded"] },
+            "expression": { "greater": ["@length(body('Filtrar_itens_em_alerta'))", 0] },
+            "actions": {
+              "Token_mencao_dono": {
+                "type": "ApiConnection",
+                "inputs": {
+                  "host": { "connection": { "name": "@parameters('$connections')['teams']['connectionId']" } },
+                  "method": "get",
+                  "path": "/beta/teams/mention/user/@{encodeURIComponent(items('Para_cada_conta')?['Dono']?['Email'])}"
+                }
+              },
+              "Postar_card_alerta": {
+                "type": "ApiConnection",
+                "runAfter": { "Token_mencao_dono": ["Succeeded"] },
+                "inputs": {
+                  "host": { "connection": { "name": "@parameters('$connections')['teams']['connectionId']" } },
+                  "method": "post",
+                  "path": "/v2/beta/teams/@{coalesce(items('Para_cada_conta')?['TeamId'], '<TEAM-ID-PADRAO>')}/channels/@{coalesce(items('Para_cada_conta')?['ChannelId'], '<CHANNEL-ID-PADRAO>')}/adaptivecard",
+                  "body": { "card": "<ver adaptive-cards/relatorio-custos.json>" }
+                }
+              }
+            },
+            "else": {
+              "actions": {
+                "Postar_card_parabens": {
+                  "type": "ApiConnection",
+                  "inputs": {
+                    "host": { "connection": { "name": "@parameters('$connections')['teams']['connectionId']" } },
+                    "method": "post",
+                    "path": "/v2/beta/teams/@{coalesce(items('Para_cada_conta')?['TeamId'], '<TEAM-ID-PADRAO>')}/channels/@{coalesce(items('Para_cada_conta')?['ChannelId'], '<CHANNEL-ID-PADRAO>')}/adaptivecard",
+                    "body": { "card": "<ver adaptive-cards/parabens.json>" }
+                  }
+                }
+              }
+            }
+          },
+          "Registrar_relatorio": {
+            "type": "ApiConnection",
+            "runAfter": { "Se_houver_alertas": ["Succeeded"] },
+            "inputs": {
+              "host": { "connection": { "name": "@parameters('$connections')['shared_sharepointonline']['connectionId']" } },
+              "method": "post",
+              "path": "/datasets/@{encodeURIComponent('https://<tenant>.sharepoint.com/sites/<site>')}/tables/@{encodeURIComponent('RelatoriosCustos')}/items",
+              "body": {
+                "Title": "@{items('Para_cada_conta')?['Title']} — @{utcNow()}",
+                "Conta": "@items('Para_cada_conta')?['Title']",
+                "AccountId": "@items('Para_cada_conta')?['AccountId']",
+                "DataEnvio": "@utcNow()",
+                "TotalUSD": "@body('Chamar_Function_AWS')?['totalCost']",
+                "TotalAnteriorUSD": "@body('Chamar_Function_AWS')?['totalPrevious']",
+                "ItensEmAlerta": "@length(body('Filtrar_itens_em_alerta'))",
+                "Status": "@if(greater(length(body('Filtrar_itens_em_alerta')), 0), 'Atencao', 'Controlado')",
+                "ResumoJson": "@string(body('Chamar_Function_AWS'))"
+              }
+            }
+          }
+        },
+        "runAfter": { "Obter_contas_ativas": ["Succeeded"] }
+      }
+    },
+    "parameters": {
+      "$connections": { "defaultValue": {}, "type": "Object" }
+    }
+  },
+  "parameters": {
+    "$connections": {
+      "value": {
+        "shared_sharepointonline": {
+          "connectionId": "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Web/connections/sharepointonline",
+          "connectionName": "sharepointonline",
+          "id": "/subscriptions/<sub>/providers/Microsoft.Web/locations/<loc>/managedApis/sharepointonline"
+        },
+        "teams": {
+          "connectionId": "/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.Web/connections/teams",
+          "connectionName": "teams",
+          "id": "/subscriptions/<sub>/providers/Microsoft.Web/locations/<loc>/managedApis/teams"
+        }
+      }
+    }
+  }
+}

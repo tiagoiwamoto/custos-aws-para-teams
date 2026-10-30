@@ -1,0 +1,109 @@
+# Tela "Enviar agora": dispara o fluxo manual e mostra o top 10 retornado
+
+- scrRelatorio:
+    Control: Screen
+    Properties:
+      Fill: =RGBA(245, 247, 250, 1)
+      OnVisible: =If(IsBlank(contaSelecionada), Set(contaSelecionada, First(colContas)), Blank())
+    Children:
+      - lblTituloRel:
+          Control: Label
+          Properties:
+            Text: ="Relatório sob demanda"
+            Size: =18
+            FontWeight: =FontWeight.Bold
+            X: =40
+            Y: =24
+      - btnVoltarRel:
+          Control: Classic/Button
+          Properties:
+            Text: ="← Voltar"
+            X: =690
+            Y: =24
+            Width: =120
+            OnSelect: =Back()
+
+      - drpConta:
+          Control: DropDown
+          Properties:
+            Items: =colContas
+            Value: ="Title"
+            Default: =contaSelecionada.Title
+            X: =40
+            Y: =80
+            Width: =300
+            OnChange: =Set(contaSelecionada, LookUp(colContas, Title = drpConta.Selected.Title))
+
+      - btnGerar:
+          Control: Classic/Button
+          Properties:
+            Text: =If(varCarregando, "Consultando AWS…", "Gerar e enviar ao Teams")
+            X: =360
+            Y: =80
+            Width: =220
+            DisplayMode: =If(varCarregando, DisplayMode.Disabled, DisplayMode.Edit)
+            OnSelect: |
+              =Set(varCarregando, true);
+               Set(varRelatorio, CustosAWSEnvioManual.Run(LookUp(ContasAWS, Title = drpConta.Selected.Title).ID));
+               ClearCollect(colTop10, varRelatorio.items);
+               Set(varCarregando, false)
+
+      - lblResumo:
+          Control: Label
+          Properties:
+            Text: =If(IsBlank(varRelatorio), "Escolha a conta e gere o relatório.", "Ontem: R$ " & Text(varRelatorio.totalCostBrl, "#,##0.00") & " (US$ " & Text(varRelatorio.totalCost, "#,##0.00") & ")  ·  Anteontem: R$ " & Text(varRelatorio.totalPreviousBrl, "#,##0.00") & "  ·  Câmbio: " & Text(varRelatorio.fx.usdBrl, "0.0000"))
+            X: =40
+            Y: =130
+            Width: =790
+            Size: =13
+
+      - galTop10:
+          Control: Gallery
+          Variant: galleryVertical
+          Properties:
+            Items: =colTop10
+            X: =40
+            Y: =170
+            Width: =790
+            Height: =480
+            TemplateSize: =48
+          Children:
+            - lblServicoNome:
+                Control: Label
+                Properties:
+                  Text: =ThisItem.service
+                  X: =12
+                  Y: =(Parent.TemplateHeight - Self.Height) / 2
+                  Width: =420
+            - lblCustoBrl:
+                Control: Label
+                Properties:
+                  Text: ="R$ " & Text(ThisItem.costBrl, "#,##0.00")
+                  FontWeight: =FontWeight.Semibold
+                  X: =440
+                  Y: =(Parent.TemplateHeight - Self.Height) / 2
+                  Width: =130
+            - lblCusto:
+                Control: Label
+                Properties:
+                  Text: ="US$ " & Text(ThisItem.cost, "#,##0.00")
+                  Color: =RGBA(120, 120, 120, 1)
+                  X: =575
+                  Y: =(Parent.TemplateHeight - Self.Height) / 2
+                  Width: =110
+            - lblDelta:
+                Control: Label
+                Properties:
+                  Text: =If(IsBlank(ThisItem.deltaPct), "novo", ThisItem.deltaPct & "%")
+                  X: =690
+                  Y: =(Parent.TemplateHeight - Self.Height) / 2
+                  Width: =55
+                  Color: =If(Coalesce(ThisItem.deltaPct, 0) > LookUp(ContasAWS, Title = drpConta.Selected.Title).CrescimentoMaxPct, Color.OrangeRed, Color.Gray)
+            - icoAlerta:
+                Control: Icon
+                Icon: =Icon.Warning
+                Properties:
+                  X: =750
+                  Y: =(Parent.TemplateHeight - 24) / 2
+                  Visible: =Or(ThisItem.cost > LookUp(ContasAWS, Title = drpConta.Selected.Title).LimiteItemUSD, Coalesce(ThisItem.deltaPct, 0) > LookUp(ContasAWS, Title = drpConta.Selected.Title).CrescimentoMaxPct)
+                  Color: =Color.OrangeRed

@@ -1,0 +1,67 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.4",
+  "msteams": { "width": "Full" },
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "Large",
+      "weight": "Bolder",
+      "text": "💰 Custos AWS — @{items('Para_cada_conta')?['Title']}",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "Conta @{items('Para_cada_conta')?['AccountId']} · período @{body('Chamar_Function_AWS')?['period']?['currentStart']} a @{body('Chamar_Function_AWS')?['period']?['currentEnd']}",
+      "isSubtle": true,
+      "spacing": "None",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "**Ontem: R$ @{body('Chamar_Function_AWS')?['totalCostBrl']}** (US$ @{body('Chamar_Function_AWS')?['totalCost']}) · anteontem: R$ @{body('Chamar_Function_AWS')?['totalPreviousBrl']} (US$ @{body('Chamar_Function_AWS')?['totalPrevious']})",
+      "spacing": "Medium",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "Câmbio: 1 USD = R$ @{body('Chamar_Function_AWS')?['fx']?['usdBrl']} (@{body('Chamar_Function_AWS')?['fx']?['source']})",
+      "isSubtle": true,
+      "spacing": "None",
+      "size": "Small",
+      "wrap": true
+    },
+    {
+      "type": "ColumnSet",
+      "separator": true,
+      "columns": [
+        { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "**Serviço**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Ontem (R$)**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Ontem (US$)**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Anteontem US$**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Δ %**" } ] }
+      ]
+    },
+    "@{variables('varLinhasItens')}",
+    {
+      "type": "Container",
+      "separator": true,
+      "style": "good",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "🎉 **Parabéns!** Todos os itens dentro do limite — gastos controlados nesta conta.",
+          "wrap": true
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "Abrir Cost Explorer",
+      "url": "https://console.aws.amazon.com/cost-management/home#/cost-explorer"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "_comment": "Fluxo disparado pelo botão 'Enviar agora' do Power App. Recebe o ID do item em ContasAWS, gera o relatório, posta no Teams e devolve o resumo para o app exibir. No Power Automate, recrie com o gatilho 'PowerApps (V2)' — esta definição serve de referência para Logic Apps.",
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "triggers": {
+      "manual": {
+        "type": "Request",
+        "kind": "Http",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "itemId": { "type": "integer", "description": "ID do item na lista ContasAWS" }
+            },
+            "required": ["itemId"]
+          }
+        }
+      }
+    },
+    "actions": {
+      "Obter_conta": {
+        "type": "ApiConnection",
+        "inputs": {
+          "host": { "connection": { "name": "@parameters('$connections')['shared_sharepointonline']['connectionId']" } },
+          "method": "get",
+          "path": "/datasets/@{encodeURIComponent('https://<tenant>.sharepoint.com/sites/<site>')}/tables/@{encodeURIComponent('ContasAWS')}/items/@{triggerBody()?['itemId']}"
+        }
+      },
+      "Chamar_Function_AWS": {
+        "type": "Http",
+        "runAfter": { "Obter_conta": ["Succeeded"] },
+        "inputs": {
+          "method": "POST",
+          "uri": "https://<function-app>.azurewebsites.net/api/top-costs?code=<function-key>",
+          "headers": { "Content-Type": "application/json" },
+          "body": {
+            "roleArn": "@body('Obter_conta')?['RoleArn']",
+            "externalId": "@body('Obter_conta')?['ExternalId']",
+            "accountName": "@body('Obter_conta')?['Title']",
+            "topN": 10
+          }
+        }
+      },
+      "Responder_ao_app": {
+        "type": "Response",
+        "runAfter": { "Chamar_Function_AWS": ["Succeeded"] },
+        "kind": "Http",
+        "inputs": {
+          "statusCode": 200,
+          "body": "@body('Chamar_Function_AWS')"
+        }
+      }
+    },
+    "parameters": {
+      "$connections": { "defaultValue": {}, "type": "Object" }
+    }
+  }
+}

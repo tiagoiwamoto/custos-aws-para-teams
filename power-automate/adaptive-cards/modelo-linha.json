@@ -1,0 +1,60 @@
+{
+  "_uso": "Modelo de cada linha do TOP 10. No fluxo, a ação 'Select' mapeia body('Chamar_Function_AWS')?['items'] para um array destes ColumnSets; depois a variável varLinhasItens recebe json(concat('[', join(body('Select_linhas'), ','), ']')).",
+  "type": "ColumnSet",
+  "columns": [
+    {
+      "type": "Column",
+      "width": "stretch",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "@{item()?['service']}",
+          "wrap": true
+        }
+      ]
+    },
+    {
+      "type": "Column",
+      "width": "auto",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "R$ @{item()?['costBrl']}"
+        }
+      ]
+    },
+    {
+      "type": "Column",
+      "width": "auto",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "@{item()?['cost']}",
+          "isSubtle": true
+        }
+      ]
+    },
+    {
+      "type": "Column",
+      "width": "auto",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "@{item()?['previousCost']}",
+          "isSubtle": true
+        }
+      ]
+    },
+    {
+      "type": "Column",
+      "width": "auto",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "@{if(equals(item()?['deltaPct'], null), 'novo', concat(item()?['deltaPct'], '%'))}",
+          "color": "@{if(greater(coalesce(item()?['deltaPct'], 0), items('Para_cada_conta')?['CrescimentoMaxPct']), 'attention', 'default')}"
+        }
+      ]
+    }
+  ]
+}

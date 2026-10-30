@@ -1,0 +1,149 @@
+{
+  "_como_visualizar": "Cole este JSON em https://adaptivecards.io/designer/ com 'Microsoft Teams' selecionado como host app. É o card de ALERTA já renderizado com dados de exemplo (conta Prod-BR, 29/10/2026, dólar a R$ 5,87). No Teams, <at>Tiago Iwamoto</at> aparece como menção real que notifica o usuário.",
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.4",
+  "msteams": { "width": "Full" },
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "Large",
+      "weight": "Bolder",
+      "text": "💰 Custos AWS — Prod-BR",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "Conta 123456789012 · período 2026-10-29 a 2026-10-30 (comparado a 2026-10-28–2026-10-29)",
+      "isSubtle": true,
+      "spacing": "None",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "**Ontem: R$ 8.742,15** (US$ 1.489,62) · anteontem: R$ 7.310,40 (US$ 1.245,55)",
+      "spacing": "Medium",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "Câmbio: 1 USD = R$ 5,8690 (awesomeapi)",
+      "isSubtle": true,
+      "spacing": "None",
+      "size": "Small",
+      "wrap": true
+    },
+    {
+      "type": "ColumnSet",
+      "separator": true,
+      "columns": [
+        { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "**Serviço**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Ontem (R$)**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Ontem (US$)**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Anteontem US$**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Δ %**" } ] }
+      ]
+    },
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "Amazon Elastic Compute Cloud", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 3.594,20" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "612.30", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "430.20", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "42.3%", "color": "attention" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "Amazon Relational Database Service", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 1.794,95" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "305.80", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "298.40", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "2.5%" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "Amazon Simple Storage Service", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 928,55" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "158.22", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "161.00", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "-1.7%" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "Amazon Elastic Kubernetes Service", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 564,31" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "96.15", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "60.30", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "59.5%", "color": "attention" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "AmazonCloudWatch", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 495,92" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "84.50", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "82.10", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "2.9%" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "AWS Lambda", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 418,69" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "71.33", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "70.00", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "1.9%" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "Amazon Virtual Private Cloud", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 345,68" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "58.90", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "57.00", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "3.3%" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "Amazon DynamoDB", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 258,90" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "44.12", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "43.50", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "1.4%" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "Amazon Route 53", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 178,45" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "30.40", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "30.40", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "0.0%" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "AWS Backup", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 116,80" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "19.90", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "0.00", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "novo", "color": "attention" } ] }
+    ]},
+    {
+      "type": "Container",
+      "separator": true,
+      "style": "warning",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "⚠️ **Atenção — itens com potencial de gasto elevado**",
+          "weight": "Bolder",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "• Amazon Elastic Compute Cloud: R$ 3.594,20 (US$ 612,30) (42.3% acima do dia anterior)\n• Amazon Elastic Kubernetes Service: R$ 564,31 (US$ 96,15) (59.5% acima do dia anterior)\n• AWS Backup: R$ 116,80 (US$ 19,90) (item novo)",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "<at>Tiago Iwamoto</at>",
+          "spacing": "Small",
+          "wrap": true
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "Abrir Cost Explorer",
+      "url": "https://console.aws.amazon.com/cost-management/home#/cost-explorer"
+    }
+  ]
+}

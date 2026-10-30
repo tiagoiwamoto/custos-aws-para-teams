@@ -1,0 +1,14 @@
+# Custos AWSp → Teams — app canvas
+# Formato: YAML de origem do Power Apps (Studio > Ver código / copiar-colar).
+# Nomes de controles podem precisar de pequenos ajustes conforme a versão do Studio.
+# Fontes de dados esperadas: listas SharePoint 'ContasAWS', 'RelatoriosCustos'
+# e o fluxo 'CustosAWSEnvioManual' (ver power-automate/GUIA-FLUXOS.md).
+
+- App:
+    Control: App
+    Properties:
+      OnStart: |
+        =ClearCollect(colContas, Filter(ContasAWS, Ativo = true));
+         ClearCollect(colRelatorios, SortByColumns(RelatoriosCustos, "DataEnvio", Descending))
+      StartScreen: =scrDashboard
+    Theme: =Theme

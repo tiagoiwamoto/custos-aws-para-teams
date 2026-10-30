@@ -1,0 +1,89 @@
+# Tela de cadastro: lista à esquerda, formulário à direita (CRUD em ContasAWS)
+
+- scrContas:
+    Control: Screen
+    Properties:
+      Fill: =RGBA(245, 247, 250, 1)
+    Children:
+      - lblTituloContas:
+          Control: Label
+          Properties:
+            Text: ="Contas AWS monitoradas"
+            Size: =18
+            FontWeight: =FontWeight.Bold
+            X: =40
+            Y: =24
+      - btnVoltar:
+          Control: Classic/Button
+          Properties:
+            Text: ="← Voltar"
+            X: =690
+            Y: =24
+            Width: =120
+            OnSelect: =Back()
+
+      - galContasEdit:
+          Control: Gallery
+          Variant: galleryVertical
+          Properties:
+            Items: =SortByColumns(ContasAWS, "Title")
+            X: =40
+            Y: =80
+            Width: =280
+            Height: =600
+            TemplateSize: =56
+          Children:
+            - lblItemConta:
+                Control: Label
+                Properties:
+                  Text: =ThisItem.Title & If(!ThisItem.Ativo, "  (inativa)", "")
+                  X: =12
+                  Y: =(Parent.TemplateHeight - Self.Height) / 2
+                  Width: =Parent.TemplateWidth - 24
+                  FontWeight: =If(galContasEdit.Selected.ID = ThisItem.ID, FontWeight.Semibold, FontWeight.Normal)
+
+      - frmConta:
+          Control: EditForm
+          Properties:
+            DataSource: =ContasAWS
+            Item: =galContasEdit.Selected
+            X: =340
+            Y: =80
+            Width: =490
+            Height: =560
+            # Inclua os cards: Title, AccountId, RoleArn, ExternalId, Dono,
+            # LimiteItemUSD, CrescimentoMaxPct, HorarioEnvio, TeamId, ChannelId, Ativo
+
+      - btnNovaConta:
+          Control: Classic/Button
+          Properties:
+            Text: ="＋ Nova"
+            X: =340
+            Y: =650
+            Width: =110
+            OnSelect: =NewForm(frmConta)
+      - btnEditar:
+          Control: Classic/Button
+          Properties:
+            Text: ="Editar"
+            X: =460
+            Y: =650
+            Width: =110
+            OnSelect: =EditForm(frmConta)
+      - btnSalvar:
+          Control: Classic/Button
+          Properties:
+            Text: ="Salvar"
+            X: =580
+            Y: =650
+            Width: =110
+            OnSelect: =SubmitForm(frmConta); Refresh(ContasAWS); ClearCollect(colContas, Filter(ContasAWS, Ativo = true))
+      - btnExcluir:
+          Control: Classic/Button
+          Properties:
+            Text: ="Excluir"
+            X: =700
+            Y: =650
+            Width: =110
+            OnSelect: =RemoveIf(ContasAWS, ID = galContasEdit.Selected.ID)
+            DisplayMode: =If(IsBlank(galContasEdit.Selected), DisplayMode.Disabled, DisplayMode.Edit)

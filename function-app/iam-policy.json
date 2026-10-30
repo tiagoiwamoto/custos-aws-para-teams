@@ -1,0 +1,41 @@
+{
+  "_comment_1": "Politica minima para o usuario/role AWS usado pela Function (credenciais em AWS_ACCESS_KEY_ID). Permite assumir as roles de leitura em cada conta-alvo.",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AssumeCostReaderRoles",
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Resource": "arn:aws:iam::*:role/PowerAutomateCostReader"
+    },
+    {
+      "Sid": "DirectCostExplorerIfNoRole",
+      "Effect": "Allow",
+      "Action": ["ce:GetCostAndUsage", "ce:GetDimensionValues"],
+      "Resource": "*"
+    }
+  ],
+  "_comment_2": "Em CADA conta-alvo, crie a role 'PowerAutomateCostReader' com esta politica:",
+  "TargetAccountRolePolicy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": ["ce:GetCostAndUsage"],
+        "Resource": "*"
+      }
+    ]
+  },
+  "_comment_3": "Trust policy da role na conta-alvo (permitir assume-role pelo usuario da Function, opcionalmente com ExternalId):",
+  "TargetAccountRoleTrust": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": { "AWS": "arn:aws:iam::<CONTA-MONITORAMENTO>:user/<usuario-function>" },
+        "Action": "sts:AssumeRole",
+        "Condition": { "StringEquals": { "sts:ExternalId": "<external-id-opcional>" } }
+      }
+    ]
+  }
+}

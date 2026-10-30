@@ -1,0 +1,95 @@
+{
+  "_como_visualizar": "Cole este JSON em https://adaptivecards.io/designer/ com 'Microsoft Teams' selecionado como host app. É o card de PARABÉNS já renderizado — postado quando nenhum item estoura limite nem crescimento (conta Dev-Sandbox, 29/10/2026).",
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.4",
+  "msteams": { "width": "Full" },
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "Large",
+      "weight": "Bolder",
+      "text": "💰 Custos AWS — Dev-Sandbox",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "Conta 210987654321 · período 2026-10-29 a 2026-10-30",
+      "isSubtle": true,
+      "spacing": "None",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "**Ontem: R$ 412,35** (US$ 70,25) · anteontem: R$ 405,10 (US$ 69,01)",
+      "spacing": "Medium",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "Câmbio: 1 USD = R$ 5,8690 (awesomeapi)",
+      "isSubtle": true,
+      "spacing": "None",
+      "size": "Small",
+      "wrap": true
+    },
+    {
+      "type": "ColumnSet",
+      "separator": true,
+      "columns": [
+        { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "**Serviço**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Ontem (R$)**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Ontem (US$)**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Anteontem US$**" } ] },
+        { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "**Δ %**" } ] }
+      ]
+    },
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "Amazon Elastic Compute Cloud", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 210,90" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "35.93", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "34.80", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "3.2%" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "Amazon Simple Storage Service", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 95,40" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "16.25", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "15.90", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "2.2%" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "AWS Lambda", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 61,20" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "10.43", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "10.50", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "-0.7%" } ] }
+    ]},
+    { "type": "ColumnSet", "columns": [
+      { "type": "Column", "width": "stretch", "items": [ { "type": "TextBlock", "text": "AmazonCloudWatch", "wrap": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "R$ 44,85" } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "7.64", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "7.81", "isSubtle": true } ] },
+      { "type": "Column", "width": "auto", "items": [ { "type": "TextBlock", "text": "-2.2%" } ] }
+    ]},
+    {
+      "type": "Container",
+      "separator": true,
+      "style": "good",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "🎉 **Parabéns!** Todos os itens dentro do limite — gastos controlados nesta conta.",
+          "wrap": true
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "Abrir Cost Explorer",
+      "url": "https://console.aws.amazon.com/cost-management/home#/cost-explorer"
+    }
+  ]
+}

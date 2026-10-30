@@ -1,0 +1,7 @@
+local.settings.json
+.python_packages/
+__pycache__/
+*.msapp
+func-*/
+.env
+/.idea/

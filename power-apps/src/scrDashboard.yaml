@@ -1,0 +1,203 @@
+# Tela inicial: KPIs + contas monitoradas + últimos envios
+
+- scrDashboard:
+    Control: Screen
+    Properties:
+      Fill: =RGBA(245, 247, 250, 1)
+      OnVisible: |
+        =Refresh(RelatoriosCustos);
+         ClearCollect(colRelatorios, SortByColumns(RelatoriosCustos, "DataEnvio", Descending))
+    Children:
+      - lblTitulo:
+          Control: Label
+          Properties:
+            Text: ="💰 Custos AWS → Teams"
+            Size: =20
+            FontWeight: =FontWeight.Bold
+            X: =40
+            Y: =24
+            Width: =600
+            Height: =48
+
+      # ---------- KPIs ----------
+      - kpiContas:
+          Control: GroupContainer
+          Properties:
+            X: =40
+            Y: =90
+            Width: =250
+            Height: =100
+            DropShadow: =DropShadow.Light
+            Fill: =RGBA(255, 255, 255, 1)
+          Children:
+            - kpiContasValor:
+                Control: Label
+                Properties:
+                  Text: =CountRows(colContas)
+                  Size: =28
+                  FontWeight: =FontWeight.Semibold
+                  Align: =Align.Center
+                  Width: =Parent.Width
+                  Height: =55
+            - kpiContasRotulo:
+                Control: Label
+                Properties:
+                  Text: ="Contas monitoradas"
+                  Size: =11
+                  Color: =RGBA(90, 90, 90, 1)
+                  Align: =Align.Center
+                  Y: =55
+                  Width: =Parent.Width
+                  Height: =40
+      - kpiAlertas:
+          Control: GroupContainer
+          Properties:
+            X: =310
+            Y: =90
+            Width: =250
+            Height: =100
+            DropShadow: =DropShadow.Light
+            Fill: =RGBA(255, 255, 255, 1)
+          Children:
+            - kpiAlertasValor:
+                Control: Label
+                Properties:
+                  Text: =CountRows(Filter(colRelatorios, Status.Value = "Atencao", Month(DataEnvio) = Month(Today())))
+                  Size: =28
+                  FontWeight: =FontWeight.Semibold
+                  Color: =RGBA(200, 60, 60, 1)
+                  Align: =Align.Center
+                  Width: =Parent.Width
+                  Height: =55
+            - kpiAlertasRotulo:
+                Control: Label
+                Properties:
+                  Text: ="Contas em atenção (mês)"
+                  Size: =11
+                  Color: =RGBA(90, 90, 90, 1)
+                  Align: =Align.Center
+                  Y: =55
+                  Width: =Parent.Width
+                  Height: =40
+      - kpiTotal:
+          Control: GroupContainer
+          Properties:
+            X: =580
+            Y: =90
+            Width: =250
+            Height: =100
+            DropShadow: =DropShadow.Light
+            Fill: =RGBA(255, 255, 255, 1)
+          Children:
+            - kpiTotalValor:
+                Control: Label
+                Properties:
+                  Text: =Text(Sum(Filter(colRelatorios, Month(DataEnvio) = Month(Today())), TotalUSD), "US$ #,##0.00")
+                  Size: =22
+                  FontWeight: =FontWeight.Semibold
+                  Align: =Align.Center
+                  Width: =Parent.Width
+                  Height: =55
+            - kpiTotalRotulo:
+                Control: Label
+                Properties:
+                  Text: ="Total no mês (soma dos relatórios diários)"
+                  Size: =11
+                  Color: =RGBA(90, 90, 90, 1)
+                  Align: =Align.Center
+                  Y: =55
+                  Width: =Parent.Width
+                  Height: =40
+
+      # ---------- Contas ----------
+      - lblContas:
+          Control: Label
+          Properties:
+            Text: ="Contas"
+            Size: =14
+            FontWeight: =FontWeight.Semibold
+            X: =40
+            Y: =210
+      - galContas:
+          Control: Gallery
+          Variant: galleryVertical
+          Properties:
+            Items: =colContas
+            X: =40
+            Y: =245
+            Width: =790
+            Height: =300
+            TemplateSize: =80
+          Children:
+            - dotStatus:
+                Control: Circle
+                Properties:
+                  Width: =16
+                  Height: =16
+                  Y: =(Parent.TemplateHeight - 16) / 2
+                  X: =20
+                  Fill: =With({r: LookUp(colRelatorios, Conta = ThisItem.Title)}, If(IsBlank(r), Color.Gray, If(r.Status.Value = "Atencao", Color.OrangeRed, Color.Green)))
+            - lblNomeConta:
+                Control: Label
+                Properties:
+                  Text: =ThisItem.Title & "  (" & ThisItem.AccountId & ")"
+                  FontWeight: =FontWeight.Semibold
+                  X: =50
+                  Y: =8
+                  Width: =400
+            - lblInfoConta:
+                Control: Label
+                Properties:
+                  Text: ="Envio diário 09:00 · Limite US$ " & ThisItem.LimiteItemUSD & "/dia · Dono: " & ThisItem.Dono.DisplayName
+                  Size: =11
+                  Color: =RGBA(100, 100, 100, 1)
+                  X: =50
+                  Y: =38
+                  Width: =600
+            - btnEnviarAgora:
+                Control: Classic/Button
+                Properties:
+                  Text: ="Enviar agora"
+                  X: =Parent.TemplateWidth - 130
+                  Y: =(Parent.TemplateHeight - 36) / 2
+                  Width: =110
+                  Height: =36
+                  OnSelect: =Navigate(scrRelatorio, ScreenTransition.None, {contaSelecionada: ThisItem})
+
+      # ---------- Últimos relatórios ----------
+      - lblHistorico:
+          Control: Label
+          Properties:
+            Text: ="Últimos envios"
+            Size: =14
+            FontWeight: =FontWeight.Semibold
+            X: =40
+            Y: =560
+      - galHistorico:
+          Control: Gallery
+          Variant: galleryVertical
+          Properties:
+            Items: =colRelatorios
+            X: =40
+            Y: =595
+            Width: =790
+            Height: =140
+            TemplateSize: =44
+          Children:
+            - lblLinhaHist:
+                Control: Label
+                Properties:
+                  Text: =ThisItem.Conta & " — US$ " & Text(ThisItem.TotalUSD, "#,##0.00") & " — " & ThisItem.ItensEmAlerta & " alerta(s) — " & ThisItem.Status.Value & " — " & Text(ThisItem.DataEnvio, "dd/mm hh:mm")
+                  Width: =Parent.TemplateWidth - 20
+                  X: =10
+                  Y: =(Parent.TemplateHeight - Self.Height) / 2
+
+      # ---------- Navegação ----------
+      - btnGerenciarContas:
+          Control: Classic/Button
+          Properties:
+            Text: ="Gerenciar contas"
+            X: =690
+            Y: =30
+            Width: =140
+            OnSelect: =Navigate(scrContas, ScreenTransition.Fade)
